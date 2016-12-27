@@ -15,11 +15,29 @@ public class SpaceController : MonoBehaviour {
 	public float Speed = 10;
 	public Boundary m_bd = new Boundary();
 	public float Roate;
+	public GameObject bolt;
+	public Transform m_spPoint;
+	public float fireRate;
+	private AudioSource m_audio;
+	private float nextFire;
+
 	void OnEnable()
 	{
 		m_rig = GetComponent<Rigidbody> ();
 		Roate = 5;
+		nextFire = 0;
+		m_audio = GetComponent<AudioSource> ();
 	}
+
+	void Update()
+	{
+		if (Input.GetButtonDown ("Fire1") && Time.time > nextFire) {
+			nextFire = Time.time + fireRate;
+			Instantiate (bolt , m_spPoint.position , m_spPoint.rotation);
+			m_audio.Play ();
+		}
+	}
+
 	//物理固定更新
 	void FixedUpdate()
 	{
