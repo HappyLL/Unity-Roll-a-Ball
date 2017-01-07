@@ -14,6 +14,7 @@ public class UserCameraMove : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		transform.position = m_offset + m_gameObj.transform.position;
+		if(m_gameObj)
+			transform.position = m_offset + m_gameObj.transform.position;
 	}
 }

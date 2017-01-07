@@ -1,22 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 //实现人物的移动和转向
 public class UserPlayerController : MonoBehaviour 
 {
-
 	public float m_speed = 5;
+	public float m_iHealth = 100.0f;
+	public float m_iDamage = 10.0f;
+	public Slider mSlider;
+	private AudioSource mAudio;
 
 	private Rigidbody m_rig;
 	private Animator m_ani;
 	private float m_rayDis = 100;
 	private int m_floorMsk;
-	//private RaycastHit m_hitPt;
+
+	private int DamageTime = 0;
+
 
 	void Start()
 	{
 		m_rig = GetComponent<Rigidbody> ();
 		m_ani = GetComponent<Animator> ();
+		mAudio = GetComponent<AudioSource> ();
 		m_floorMsk = LayerMask.GetMask ("UserFloor");
 		//m_hitPt = new RaycastHit ();
 	}
@@ -44,12 +51,41 @@ public class UserPlayerController : MonoBehaviour
 		//得到在屏幕中鼠标点击为开始点 产生的射线
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		RaycastHit hit;
-		if (Physics.Raycast (ray, out hit, m_rayDis, m_floorMsk)) 
-		{
+		if (Physics.Raycast (ray, out hit, m_rayDis, m_floorMsk)) {
 			Vector3 rotion = hit.point - transform.position;
 			rotion.y = 0;
 			//Debug.Log ("x: "+rotion.x+" y:"+rotion.y);
-			m_rig.MoveRotation(Quaternion.LookRotation (rotion));
+			m_rig.MoveRotation (Quaternion.LookRotation (rotion));
 		}
+	}
+
+	void OnCollisionStay(Collision obj)
+	{
+		if (m_iHealth == 0)
+			return;
+		if (obj.collider.CompareTag ("Enimy")) 
+		{
+			if (DamageTime > 0) {
+				DamageTime = DamageTime - 1;
+				return;
+			}
+			m_iHealth = m_iHealth - m_iDamage;
+			if (m_iHealth > 0) {
+				mSlider.value = m_iHealth;
+			} 
+			else 
+			{
+				mAudio.Play ();
+				mSlider.value = 0;
+				m_ani.SetTrigger ("Dead");
+				Destroy (gameObject, 2.0f);
+			}
+			DamageTime = 10;
+		}
+	}
+
+	public bool IsDead()
+	{
+		return m_iHealth == 0;	
 	}
 }
