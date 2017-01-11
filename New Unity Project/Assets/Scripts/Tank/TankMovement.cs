@@ -98,10 +98,14 @@ public class TankMovement : MonoBehaviour
 
 
     private void Turn()
-    {
+    { 
         // Adjust the rotation of the tank based on the player's input.
         float turn = m_TurnSpeed * m_TurnInputValue * Time.deltaTime;
+        //Debug.Log(turn);
+        //因为开始时m_TurnInputValue是不断变大的(到1就维持不变了) 所以turnRotation开始时是不断变大
         Quaternion turnRotation = Quaternion.Euler(0, turn, 0);
+        float originYR = m_Rigidbody.rotation.y;
         m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
+        
     }
 }
